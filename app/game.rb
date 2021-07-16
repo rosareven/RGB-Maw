@@ -28,10 +28,14 @@ tick {
     sprites << $state.blue
 
     labels << $state.mouse_label.merge!(text: "X: "+mouse.x.to_s+" Y: "+mouse.y.to_s)
+    labels << 
 
     blocks.each do |e|
         if mouse.inside_rect? e.rect
             labels << $state.block_label.merge!(text: e.name)
+            if mouse.button_left & mouse.moved
+                blocks << $state.dragging ||= e.merge!(x: mouse.x, y: mouse.y)
+            end
         end
     end
 }
