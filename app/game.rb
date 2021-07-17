@@ -18,24 +18,29 @@ init {
     
     $state.mouse_label = { x: 10, y: grid.h - 10 }
     $state.block_label = { x: grid.w/2, y: grid.h - 10, alignment_enum: 1}
+
+    $state.dragging ||= false
 }
 
 tick {
     init if controls.reset_down?
     solids << $state.background
-    sprites << $state.green
-    sprites << $state.red
-    sprites << $state.blue
-
     labels << $state.mouse_label.merge!(text: "X: "+mouse.x.to_s+" Y: "+mouse.y.to_s)
-    labels << 
 
     blocks.each do |e|
+        sprites << e
         if mouse.inside_rect? e.rect
             labels << $state.block_label.merge!(text: e.name)
-            if mouse.button_left & mouse.moved
-                blocks << $state.dragging ||= e.merge!(x: mouse.x, y: mouse.y)
+            if mouse.button_left
+                $state.dragging = true
+                $state.dragging_block = e
             end
+        end
+        while $state.dragging do
+            sprites << $state.dragging_block.merge(x: mouse.x, y: mouse.y)
+        end
+        if $state.dragging & mouse.button_left
+            $state.dragging = false
         end
     end
 }
